@@ -36,7 +36,7 @@ CloudWatchStream.prototype._write = function _write(record, _enc, cb) {
 
 CloudWatchStream.prototype._writeLogs = function _writeLogs(record) {
   if (this.sequenceToken === null) {
-    return this._getSequenceToken(this._writeLogs.bind(this));
+    return this._getSequenceToken(this._writeLogs.bind(this), record);
   }
   var log = {
     logGroupName: this.logGroupName,
@@ -67,7 +67,7 @@ CloudWatchStream.prototype._writeLogs = function _writeLogs(record) {
   }
 };
 
-CloudWatchStream.prototype._getSequenceToken = function _getSequenceToken(done) {
+CloudWatchStream.prototype._getSequenceToken = function _getSequenceToken(done, record) {
   var params = {
     logGroupName: this.logGroupName,
     logStreamNamePrefix: this.logStreamName
@@ -87,7 +87,7 @@ CloudWatchStream.prototype._getSequenceToken = function _getSequenceToken(done) 
       return;
     }
     obj.sequenceToken = data.logStreams[0].uploadSequenceToken;
-    done();
+    done(record);
   });
 
   function createStreamCb(err) {
