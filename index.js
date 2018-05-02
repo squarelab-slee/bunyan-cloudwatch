@@ -32,7 +32,7 @@ function CloudWatchStream(opts) {
 
 CloudWatchStream.prototype._write = function _write(record, _enc, cb) {
 	console.log(record);
-  if (record.levels >= this.instantWriteLevel) {
+  if (record.level >= this.instantWriteLevel) {
     console.log('instant write:');
     console.log(record);
     this._writeLogs();
