@@ -32,6 +32,7 @@ function CloudWatchStream(opts) {
 }
 
 CloudWatchStream.prototype._write = function _write(record, _enc, cb) {
+  this.queuedLogs.push(record);
   if (record.level >= this.instantWriteLevel) {
     console.log('instant write:');
     console.log(record);
@@ -39,7 +40,6 @@ CloudWatchStream.prototype._write = function _write(record, _enc, cb) {
     cb();
     return;
   }
-  this.queuedLogs.push(record);
   if (!this.writeQueued) {
     this.writeQueued = true;
     setTimeout(this._writeLogs.bind(this), this.writeInterval);
