@@ -18,6 +18,7 @@ function CloudWatchStream(opts) {
   this.logGroupName = opts.logGroupName;
   this.logStreamName = opts.logStreamName;
   this.writeInterval = opts.writeInterval || 0;
+  this.instantWriteLevel = 40;
 
   if (opts.AWS) {
     AWS = opts.AWS;
@@ -33,7 +34,13 @@ CloudWatchStream.prototype._write = function _write(record, _enc, cb) {
   this.queuedLogs.push(record);
   if (!this.writeQueued) {
     this.writeQueued = true;
-    setTimeout(this._writeLogs.bind(this), this.writeInterval);
+    if (record.levels >= this.instantWriteLevel) {
+    	console.log('instant write:');
+    	console.log(record);
+		this._writeLogs();
+    } else {
+    	setTimeout(this._writeLogs.bind(this), this.writeInterval);
+    }
   }
   cb();
 };
