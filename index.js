@@ -38,7 +38,7 @@ CloudWatchStream.prototype._write = function _write(record, _enc, cb) {
     try {
       this._writeLogs();
     } catch (err) {
-      this._err(err);
+      // this._err(err);
     }
     cb();
     return;
