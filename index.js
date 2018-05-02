@@ -42,7 +42,7 @@ CloudWatchStream.prototype._writeLogs = function _writeLogs(record) {
     logGroupName: this.logGroupName,
     logStreamName: this.logStreamName,
     sequenceToken: this.sequenceToken,
-    logEvents: [record],
+    logEvents: [createCWLog(record)],
   };
   var obj = this;
   writeLog();
