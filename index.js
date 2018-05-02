@@ -30,14 +30,13 @@ function CloudWatchStream(opts) {
 }
 
 CloudWatchStream.prototype._write = function _write(record, _enc, cb) {
-  this.record = record;
-  this._writeLogs();
+  this._writeLogs(record);
   cb();
 };
 
-CloudWatchStream.prototype._writeLogs = function _writeLogs() {
+CloudWatchStream.prototype._writeLogs = function _writeLogs(record) {
   if (this.sequenceToken === null) {
-    return this._getSequenceToken(this._writeLogs.bind(this));
+    return this._getSequenceToken(this._writeLogs.bind(this), record);
   }
   var log = {
     logGroupName: this.logGroupName,
@@ -61,9 +60,6 @@ CloudWatchStream.prototype._writeLogs = function _writeLogs() {
         return obj._error(err);
       }
       obj.sequenceToken = res.nextSequenceToken;
-      if (obj.queuedLogs.length) {
-        return setTimeout(obj._writeLogs.bind(obj), obj.writeInterval);
-      }
     });
   }
 };
