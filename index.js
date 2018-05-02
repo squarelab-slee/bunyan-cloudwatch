@@ -64,7 +64,7 @@ CloudWatchStream.prototype._writeLogs = function _writeLogs(record) {
   }
 };
 
-CloudWatchStream.prototype._getSequenceToken = function _getSequenceToken(done) {
+CloudWatchStream.prototype._getSequenceToken = function _getSequenceToken(done, record) {
   var params = {
     logGroupName: this.logGroupName,
     logStreamNamePrefix: this.logStreamName
@@ -84,13 +84,15 @@ CloudWatchStream.prototype._getSequenceToken = function _getSequenceToken(done) 
       return;
     }
     obj.sequenceToken = data.logStreams[0].uploadSequenceToken;
-    done();
+    done(record);
   });
 
   function createStreamCb(err) {
     if (err) return obj._error(err);
     // call again to verify stream was created - silently fails sometimes!
-    obj._getSequenceToken(done);
+    obj._getSequenceToken(() => {
+      done(record);
+    });
   }
 };
 
