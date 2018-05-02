@@ -26,29 +26,15 @@ function CloudWatchStream(opts) {
   }
 
   this.cloudwatch = new AWS.CloudWatchLogs(opts.cloudWatchLogsOptions);
-  this.queuedLogs = [];
   this.sequenceToken = null;
-  this.writeQueued = false;
 }
 
 CloudWatchStream.prototype._write = function _write(record, _enc, cb) {
-  this.queuedLogs.push(record);
-  if (record.level >= this.instantWriteLevel) {
-    this.writeQueued = true;
-    console.log('instant write:');
-    console.log(record);
-    this._writeLogs();
-    cb();
-    return;
-  }
-  if (!this.writeQueued) {
-    this.writeQueued = true;
-    setTimeout(this._writeLogs.bind(this), this.writeInterval);
-  }
+  this._writeLogs(record);
   cb();
 };
 
-CloudWatchStream.prototype._writeLogs = function _writeLogs() {
+CloudWatchStream.prototype._writeLogs = function _writeLogs(record) {
   if (this.sequenceToken === null) {
     return this._getSequenceToken(this._writeLogs.bind(this));
   }
@@ -56,9 +42,8 @@ CloudWatchStream.prototype._writeLogs = function _writeLogs() {
     logGroupName: this.logGroupName,
     logStreamName: this.logStreamName,
     sequenceToken: this.sequenceToken,
-    logEvents: this.queuedLogs.map(createCWLog)
+    logEvents: record,
   };
-  this.queuedLogs = [];
   var obj = this;
   writeLog();
 
@@ -78,7 +63,6 @@ CloudWatchStream.prototype._writeLogs = function _writeLogs() {
       if (obj.queuedLogs.length) {
         return setTimeout(obj._writeLogs.bind(obj), obj.writeInterval);
       }
-      obj.writeQueued = false;
     });
   }
 };
