@@ -19,6 +19,7 @@ function CloudWatchStream(opts) {
   this.logStreamName = opts.logStreamName;
   this.writeInterval = opts.writeInterval || 0;
   this.instantWriteLevel = opts.instantWriteLevel || 40;
+  this.onError = opts.onError || () => {};
 
   if (opts.AWS) {
     AWS = opts.AWS;
@@ -34,12 +35,7 @@ CloudWatchStream.prototype._write = function _write(record, _enc, cb) {
   if (record.level >= this.instantWriteLevel) {
     console.log('instant write:');
     console.log(record);
-    try {
-      this._writeLogs();
-    } catch (err) {
-	    console.log(err);
-      // this._err(err);
-    }
+    this._writeLogs();
     cb();
     return;
   }
