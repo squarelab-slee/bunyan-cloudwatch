@@ -55,7 +55,7 @@ CloudWatchStream.prototype._writeLogs = function _writeLogs(record) {
           return obj._getSequenceToken(function () {
             log.sequenceToken = obj.sequenceToken;
             setTimeout(writeLog, obj.writeInterval);
-          });
+          }, record);
         }
         return obj._error(err);
       }
