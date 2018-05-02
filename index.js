@@ -18,7 +18,7 @@ function CloudWatchStream(opts) {
   this.logGroupName = opts.logGroupName;
   this.logStreamName = opts.logStreamName;
   this.writeInterval = opts.writeInterval || 0;
-  this.instantWriteLevel = 40;
+  this.instantWriteLevel = opts.instantWriteLevel || 40;
 
   if (opts.AWS) {
     AWS = opts.AWS;
